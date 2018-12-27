@@ -3,6 +3,7 @@
     <div id="nav">
       <router-link to="/">基础组件</router-link> |
       <router-link to="/about">反馈组件</router-link>
+      <router-link to="/refresh">下拉刷新</router-link>
     </div>
     <router-view/>
   </div>

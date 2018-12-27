@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import { Dialog } from 'vant'
 import './css/icon.styl'
+import { Dialog, Lazyload } from 'vant'
 
-Vue.use(Dialog)
 Vue.config.productionTip = false
+Vue.use(Dialog)
+Vue.use(Lazyload)
 
 new Vue({
   router,
