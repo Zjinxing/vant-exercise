@@ -21,20 +21,36 @@
         @edit="onEdit"
         :list="list"></van-address-list>
     </div>
+    <div class="area">
+      <van-button type="primary" size="large" @click="show=true">请选择地区</van-button>
+      <van-actionsheet v-model="show">
+        <van-area 
+        :area-list="areaList"
+        :value="value"
+        @confirm="chooseArea"
+        @change="cityChange"
+        @cancel="cancelChoose"></van-area>
+      </van-actionsheet>
+    </div>
   </div>
 </template>
 
 <script>
-import { AddressEdit, Toast, AddressList } from 'vant'
+import { AddressEdit, Toast, AddressList, Area, Actionsheet, Button } from 'vant'
 import area from 'vant/packages/area/demo/area'
 export default {
   name: 'business',
   components: {
+    [Button.name]: Button,
+    [Actionsheet.name]: Actionsheet,
+    [Area.name]: Area,
     [AddressList.name]: AddressList,
     [AddressEdit.name]: AddressEdit
   },
   data () {
     return {
+      show: false,
+      value: '110101',
       areaList: area,
       searchResult: [],
       chosenAddressId: 1,
@@ -63,6 +79,19 @@ export default {
     }
   },
   methods: {
+    cityChange (picker) {
+      Toast('改变了选择城市')
+    },
+    chooseArea (data) {
+      console.log(data)
+      Toast(`您选择的是${data[0].name+data[1].name+data[2].name}`)
+      this.value = data[2].code
+      this.show = false
+    },
+    cancelChoose () {
+      this.show = false
+      Toast('取消了选择')
+    },
     onAdd () {
       Toast('新增地址')
     },
@@ -85,3 +114,8 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="stylus">
+.addr-list >>> .van-address-list__add
+  position static
+</style>
