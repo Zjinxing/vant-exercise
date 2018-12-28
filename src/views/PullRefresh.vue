@@ -67,12 +67,12 @@
           <van-button plain type="danger" @click="previewImg1">异步退出</van-button>
         </div>
         <div class="noticebar">
-          <van-notice-bar 
+          <van-notice-bar
             left-icon="volume-o"
             text="足协杯战线连续第2年上演广州德比战，上赛季半决赛上恒大以两回合5-3的总比分淘汰富力。" />
           <van-notice-bar :scrollable="false" left-icon="volume-o">
             足协杯战线连续第2年上演广州德比战，上赛季半决赛上恒大以两回合5-3的总比分淘汰富力。
-          </van-notice-bar>  
+          </van-notice-bar>
           <van-notice-bar left-icon="volume-o" mode="closeable">
             足协杯战线连续第2年上演广州德比战，上赛季半决赛上恒大以两回合5-3的总比分淘汰富力。
           </van-notice-bar>
@@ -93,11 +93,57 @@
           <br>
           <van-progress inactive :percentage="60" />
           <br>
-          <van-progress 
+          <van-progress
             :percentage="85"
             pivot-text="定制"
             pivot-color="#faa"
             color="linear-gradient(to right, #f0f, #f00)" />
+        </div>
+        <div class="steps">
+          <h3>steps步骤条</h3>
+          <b>引入steps，step组件</b>
+          <van-steps :active="1" title="横向进度条" description="description描述信息" icon="like" icon-class="favor">
+            <van-step>步骤一</van-step>
+            <van-step>步骤二</van-step>
+            <van-step>步骤三</van-step>
+            <van-step>步骤四</van-step>
+          </van-steps>
+          <van-steps :active="2" title="纵向进度条" direction="vertical" active-color="#47f">
+            <van-icon slot="icon" name="like-o" />
+            <div slot="message-extra">slot="message-extra"状态栏添加额外的元素</div>
+            <van-step>步骤一</van-step>
+            <van-step>步骤二</van-step>
+            <van-step>步骤三</van-step>
+            <van-step>步骤四</van-step>
+          </van-steps>
+        </div>
+        <div class="swipe">
+          <van-swipe :autoplay="3000"
+            indicator-color="#faa"
+            :duration="300"
+            :initial-swipe="0"
+            :loop="true"
+            :width="375"
+            :height="375"
+            @change="swipeChange"
+            :touchable="true">
+            <van-swipe-item v-for="(item, index) in imageList" :key="index">
+              <img :src="item" alt="" width="100%" height="100%">
+            </van-swipe-item>
+            <div slot="indicator">{{currentIndex}}/4</div>
+          </van-swipe>
+        </div>
+        <div class="tag">
+          <van-row type="flex" justify="space-around" style="flex-wrap: wrap">
+            <van-tag>默认</van-tag>
+            <van-tag type="danger">type=danger</van-tag>
+            <van-tag type="primary">primary</van-tag>
+            <van-tag type="success">success</van-tag>
+            <van-tag plain color="red">plain color</van-tag>
+            <van-tag mark plain color="#f0f">mark</van-tag>
+            <van-tag color="#aaf" text-color="#f22" size="large">largeTag</van-tag>
+            <van-tag color="#aaf" text-color="#f22" size="medium">mediumTag</van-tag>
+          </van-row>
         </div>
         <div class="lazyload">
           <h3>图片的懒加载</h3>
@@ -135,13 +181,20 @@
 </template>
 
 <script>
-import { PullRefresh, Circle, Button, Collapse, 
-  CollapseItem, Icon, ImagePreview, Toast, Dialog, 
-  List, Cell, NoticeBar, Panel,Progress } from 'vant'
+import { PullRefresh, Circle, Button, Collapse,
+  CollapseItem, Icon, ImagePreview, Toast, Dialog,
+  List, Cell, NoticeBar, Panel, Progress, Steps, Step,
+  Swipe, SwipeItem, Tag, Row } from 'vant'
 
 export default {
   name: 'PullRefresh',
   components: {
+    [Row.name]: Row,
+    [Tag.name]: Tag,
+    [Swipe.name]: Swipe,
+    [SwipeItem.name]: SwipeItem,
+    [Steps.name]: Steps,
+    [Step.name]: Step,
     [Progress.name]: Progress,
     [Panel.name]: Panel,
     [NoticeBar.name]: NoticeBar,
@@ -156,6 +209,7 @@ export default {
   },
   data () {
     return {
+      currentIndex: 1,
       list: [],
       loading: false,
       finished: false,
@@ -174,11 +228,7 @@ export default {
         'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/faaae5c7403d1c658045b7bed644f3db.jpg',
         'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/6fc84ef8403b88f08013a02332783784.jpg',
         'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/d698e745406545e28072eba4a6d377b9.jpg',
-        'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/ae4e34a440fdca7b806441faf7373e31.jpg',
-        'https://bbs.qn.img-space.com/201812/26/52126831ba8d146d61445ee735f031fb.jpg?imageView2/2/w/1024/q/100/ignore-error/1/',
-        'https://bbs.qn.img-space.com/201812/26/47ba3ba93b59359e6242ee40cad4d78e.jpg?imageView2/2/w/1024/q/100/ignore-error/1/',
-        'https://bbs.qn.img-space.com/201812/26/7d6ab31228c16e8219814730f4c01a01.jpg?imageView2/2/w/1024/q/100/ignore-error/1/',
-        'https://bbs.qn.img-space.com/201812/26/32fd1c6d708623a4c0fc62d8dd62d465.jpg?imageView2/2/w/1024/q/100/ignore-error/1/'
+        'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/ae4e34a440fdca7b806441faf7373e31.jpg'
       ]
     }
   },
@@ -191,7 +241,11 @@ export default {
     }
   },
   methods: {
-    jumpTo() {
+    swipeChange (index) {
+      // Toast(`当前是第${index + 1}张图片`)
+      this.currentIndex = index + 1
+    },
+    jumpTo () {
       Toast('即将跳转至详情页')
     },
     onLoad () {
@@ -258,6 +312,9 @@ export default {
 <style scoped lang="stylus">
 .pull-refresh
   width 100%
+  .steps >>> .favor
+    color #f55
+    font-size 24px
 .close
   position fixed
   left 50%

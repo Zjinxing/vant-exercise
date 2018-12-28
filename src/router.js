@@ -5,6 +5,7 @@ import Home from './views/Home.vue'
 Vue.use(Router)
 
 export default new Router({
+  // mode: 'history',
   routes: [
     {
       path: '/',
@@ -23,6 +24,16 @@ export default new Router({
       path: '/refresh',
       name: 'refresh',
       component: () => import('./views/PullRefresh')
+    },
+    {
+      path: '/navs',
+      name: 'navs',
+      component: () => import('./views/Navs')
+    },
+    {
+      path: '/business',
+      name: 'business',
+      component: () => import('./views/Business')
     }
   ]
 })
