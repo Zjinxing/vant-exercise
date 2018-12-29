@@ -1,3 +1,12 @@
-@import "//at.alicdn.com/t/font_872513_5ljm3nvpd6u.css"
+@import "//at.alicdn.com/t/font_872513_5ljm3nvpd6u.css" /**引入外部icon**/
 .van-cell__title
-  text-align left
+  text-align left // Cell 单元格标题左对齐，默认为居中
+.van-card .van-card__content
+  overflow hidden // Card 商品描述商品标题名称过长时显示省略号，否则样式变样
+  .van-card__price, .van-card__origin-price
+    float left // 价格靠左，否则是居中的
+.van-contact-list__add
+  position fixed
+  left 0
+  bottom 0    
+  z-index 9999

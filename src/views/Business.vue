@@ -21,26 +21,150 @@
         @edit="onEdit"
         :list="list"></van-address-list>
     </div>
+    <br>
     <div class="area">
+      <h3>省市区选择器</h3>
+      <p style="text-align:left">
+        添加loading状态时，文字将会被隐藏。
+        <b>area-list：</b>地区数据 <br>
+        <b>value：</b>当前所选地区的编号 <br>
+        <b>item-height：</b>每一项所占的宽度 <br>
+        <b>columns-num:</b> 显示列数，默认为3。 <br>
+        <b>loading：</b>是否显示加载状态 <br>
+        <b>visible-item-count：</b>可见选项的个数 <br>
+        <b>confirm(data)事件：</b>点击确认时触发, 参数data为一个数组，包含当前选中的城市 <br>
+        <b>cancel事件</b>：点击取消时触发 <br>
+        <b>change(picker, data, index)事件</b>：改变选择时触发。三个参数，picker为picker实例，data同confirm的data，index为当前列索引 <br>
+        <b>reset方法</b>：通过ref调用area的reset方法，重置每一列为第一项
+      </p>
       <van-button type="primary" size="large" @click="show=true">请选择地区</van-button>
       <van-actionsheet v-model="show">
-        <van-area 
+        <van-area
         :area-list="areaList"
         :value="value"
+        :item-height="60"
+        :visible-item-count="6"
         @confirm="chooseArea"
         @change="cityChange"
         @cancel="cancelChoose"></van-area>
       </van-actionsheet>
     </div>
+    <div class="card">
+      <h3>card商品卡片</h3>
+      <p><b style="color: #f33">注意：</b> .van-card使用的是flex布局，左边缩略图固定宽高，右侧.van-card__content属性flex：1自动填满
+      剩余空间，title和desc未指名width，且文字不换行，文字内容过长时.van-card__content宽度也相应的变得很大，此时样式会
+      变得超出预期，如下图：因此要给.van-card__content加一个overflow：hidden属性。<br> <br></p>
+      <b>变样Card图片</b>
+      <img src="@/assets/img/van-card_bad.png" alt="变样Card图片" width="100%"> <br>
+      <b>正常的Card</b>
+      <img src="@/assets/img/van-card_good.png" alt="变样Card图片" width="100%"> <br>
+      <p>价格现在是居中的，靠左可以添加float：left解决</p>
+      <van-card
+        num="2"
+        price="2.00"
+        origin-price="199.00"
+        tag="标签"
+        title="商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题"
+        desc="描述信息描述信息描述信息描述息商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题"
+        :thumb="imgUrl"
+        :thumb-link="imgUrl" />
+      <b>使用插槽</b>
+      <p style="text-align: left">
+        van-card提供了5个插槽 <br>
+        1、title：自定义标题 <br>
+        2、desc: 自定义描述内容 <br>
+        3、tags：自定义desc下方的内容 <br>
+        4、thumb：自定义图片 <br>
+        5、footer：自定义右下角内容
+      </p>
+      <van-card num="2" price="88" origin-price="998">
+        <div slot="thumb">
+          <img :src="imgUrl" alt="">
+        </div>
+        <div slot="title" class="van-card__title">
+          <van-icon name="like" size="16px" color="#f35" />
+          商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题标题商品标题商品标题
+        </div>
+        <div slot="desc" class="van-card__desc van-ellipsis">
+          <van-icon class-prefix="iconfont icon-star" color="#f33" />描述信息描述信息描述信息描述息商品标题商品标题商品标题商品标题商品标题商品标题商品标题商品标题
+        </div>
+        <div slot="tags" style="display:flex">
+          <van-button plain type="danger" size="mini">标签一</van-button>
+          <van-button plain type="danger" size="mini">标签二</van-button>
+        </div>
+        <div slot="footer">
+          <van-button type="danger" size="mini">删除</van-button>
+          <van-button type="primary" size="mini">结算</van-button>
+        </div>
+      </van-card>
+    </div>
+    <div class="contact">
+      <h3>联系人</h3>
+      <!-- 联系人卡片 -->
+      <p>
+        <b style="color: #f33">vant 1.5.0 ContactList Bug: </b>ContactList组件中使用了Button组件，但未引入，
+        直接像其他组件一样引用的话会报错，需要修改 'vant/packages/contact-list'中的index.vue，修改后从上述目录引入。
+        contact-edit如果输入框没有输入内容直接点击保存，控制台会报错
+      </p>
+      <van-contact-card
+        :type="cardType"
+        :name="currentContact.name"
+        :tel="currentContact.tel"
+        @click="showContactList=true" />
+      <!-- 联系人列表,放在popup弹出层中 -->
+      <van-popup position="bottom" v-model="showContactList" style="height: 100vh">
+        <van-contact-list
+          v-model="choosenContactId"
+          :list="list"
+          add-text="添加联系人"
+          @add="addContact"
+          @edit="contactEdit"
+          @select="onSelect"
+        />
+      </van-popup>
+      <!-- 编辑联系人 -->
+      <van-popup position="bottom" v-model="editContact" style="height:100%">
+        <!-- 如果姓名电话有一个没填写就会报错 -->
+        <van-contact-edit 
+          :contact-info="editingContact"
+          :is-edit="isEdit"
+          @save="saveContact"
+          @delete="delContact" />
+      </van-popup>
+    </div>
+    <div class="coupon">
+      <van-coupon-cell 
+        title="优惠券名称"
+        :choosenCoupon="choosenCoupon"
+        :coupons="coupons"
+        @click="showCoupons=true" />
+      <van-popup v-model="showCoupons" position="bottom">
+        <van-coupon-list
+          :coupons="coupons" />
+      </van-popup>  
+    </div>
   </div>
 </template>
 
 <script>
-import { AddressEdit, Toast, AddressList, Area, Actionsheet, Button } from 'vant'
+import { AddressEdit, Toast, AddressList,
+  Area, Actionsheet, Button, Card, Icon,
+  ContactCard,  ContactEdit, CouponCell, CouponList,
+  Popup } from 'vant'
+// vant 1.5.0 ContactList 组件使用了Button但未引入，修改后从此处引入ContactList
+import ContactList from 'vant/packages/contact-list' 
 import area from 'vant/packages/area/demo/area'
 export default {
   name: 'business',
   components: {
+    [CouponCell.name]: CouponCell,
+    [CouponList.name]: CouponList,
+    [Popup.name]: Popup,
+    [ContactCard.name]: ContactCard,
+    [ContactEdit.name]: ContactEdit,
+    [ContactList.name]: ContactList,
+    [Icon.name]: Icon,
+    [Card.name]: Card,
     [Button.name]: Button,
     [Actionsheet.name]: Actionsheet,
     [Area.name]: Area,
@@ -49,28 +173,49 @@ export default {
   },
   data () {
     return {
+      showCoupons: false,
+      choosenCoupon: -1,
+      isEdit: false,
+      editingContact: {},
+      editContact: false,
+      choosenContactId: null,
+      showContactList: false,
       show: false,
-      value: '110101',
+      value: '11012',
       areaList: area,
       searchResult: [],
       chosenAddressId: 1,
+      imgUrl: 'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/d698e745406545e28072eba4a6d377b9.jpg',
+      coupons: [
+        {
+          available: 1,
+          id: 0,
+          name: '优惠券一',
+          discount: 88,
+          denominations: 0,
+          originCondition: 10000,
+          startAt: 1546080731,
+          endAt: 1556080731,
+          reson: ''
+        },
+      ],
       list: [
         {
-          id: '1',
+          id: '0',
           name: '张三',
           tel: '13000000000',
           address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室'
         },
         {
-          id: '2',
+          id: '1',
           name: '李四',
-          tel: '1310000000',
+          tel: '13100000001',
           address: '浙江省杭州市拱墅区莫干山路 50 号'
         }
       ],
       disabledList: [
         {
-          id: '3',
+          id: '2',
           name: '王五',
           tel: '1320000000',
           address: '浙江省杭州市滨江区江南大道 15 号'
@@ -78,13 +223,60 @@ export default {
       ]
     }
   },
+  computed: {
+    cardType () {
+      return this.choosenContactId === null ? 'add' : 'edit'
+    },
+    currentContact () {
+      const id = this.choosenContactId
+      return id !== null ? this.list.filter(item => id === item.id)[0]: {}
+    }
+  },
   methods: {
-    cityChange (picker) {
+    delContact (contact) {
+      console.log(contact)
+      const id = contact.id
+      this.list = this.list.filter(item => item.id !== id) 
+      this.editContact = false
+      if (this.choosenId = contact.id) {
+        this.choosenId = null
+      }
+    },
+    saveContact(contact) {
+      console.log(contact)
+      this.editContact = false
+      this.showContactList = false
+      // this.isEdit = false
+      if(this.isEdit) {
+        this.list = this.list.map(item => item.id === contact.id? contact: item)
+      } else {
+        this.list.push(contact)
+      }      
+    },
+    onSelect () {
+      console.log('select')
+      this.showContactList = false
+      this.editContact = false
+    },
+    contactEdit (item) {
+      console.log('edit')
+      this.editContact = true
+      this.isEdit = true
+      this.editingContact = item
+    },
+    addContact () {
+      this.isEdit = false
+      this.editingContact = {id: this.list.length}
+      this.editContact = true
+    },
+    cityChange (picker, data, index) {
       Toast('改变了选择城市')
+      console.log(picker)
+      console.log(data, index)
     },
     chooseArea (data) {
       console.log(data)
-      Toast(`您选择的是${data[0].name+data[1].name+data[2].name}`)
+      Toast(`您选择的是${data[0].name + data[1].name + data[2].name}`)
       this.value = data[2].code
       this.show = false
     },
@@ -116,6 +308,10 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.addr-list >>> .van-address-list__add
-  position static
+.addr-list
+  position relative
+  & >>> .van-address-list__add
+    position absolute
+    bottom 0
+    z-index 100
 </style>
