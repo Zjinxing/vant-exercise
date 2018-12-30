@@ -114,7 +114,7 @@
       <!-- 联系人列表,放在popup弹出层中 -->
       <van-popup position="bottom" v-model="showContactList" style="height: 100vh">
         <van-contact-list
-          v-model="choosenContactId"
+          v-model="chosenContactId"
           :list="list"
           add-text="添加联系人"
           @add="addContact"
@@ -125,7 +125,7 @@
       <!-- 编辑联系人 -->
       <van-popup position="bottom" v-model="editContact" style="height:100%">
         <!-- 如果姓名电话有一个没填写就会报错 -->
-        <van-contact-edit 
+        <van-contact-edit
           :contact-info="editingContact"
           :is-edit="isEdit"
           @save="saveContact"
@@ -133,30 +133,110 @@
       </van-popup>
     </div>
     <div class="coupon">
-      <van-coupon-cell 
+      <van-coupon-cell
         title="优惠券名称"
-        :choosenCoupon="choosenCoupon"
+        :chosen-coupon="chosenCoupon"
         :coupons="coupons"
         @click="showCoupons=true" />
       <van-popup v-model="showCoupons" position="bottom">
         <van-coupon-list
-          :coupons="coupons" />
-      </van-popup>  
+          exchange-button-text="确认兑换"
+          input-placeholder="请输入兑换码"
+          :coupons="coupons"
+          :disabled-coupons="disabledCoupons"
+          :chosen-coupon="chosenCoupon"
+          @change="changeCoupons" />
+      </van-popup>
+    </div>
+    <div class="cart">
+      <h3>商品导航——购物车</h3>
+      <van-goods-action>
+        <van-goods-action-mini-btn
+          icon="chat-o"
+          text="客服"
+          @click="chat" />
+        <van-goods-action-mini-btn
+          icon="cart-o"
+          text="购物车"
+          info="5"
+          @click="cart" />
+        <van-goods-action-big-btn
+          text="加入购物车"
+          @click="addToCart" />
+        <van-goods-action-big-btn
+          primary
+          text="立即购买"
+          @click="buy" />
+      </van-goods-action>
+    </div>
+    <br>
+    <br>
+    <div class="submit-bar">
+      <h3>订单提交</h3>
+      <van-submit-bar
+        label="价格总计"
+        button-text="提交订单"
+        tip="您的货物本地仓无货，将为您免费调货，配送可能有延迟"
+        :price="9900"
+        @submit="onSubmit" />
+      <van-submit-bar
+        disabled
+        label="价格总计"
+        button-text="禁用状态"
+        button-type="warning"
+        tip="您的货物本地仓无货，将为您免费调货，配送可能有延迟"
+        :price="9900"
+        @submit="onSubmit" />
+      <van-submit-bar
+        loading
+        label="loading状态"
+        button-text="提交订单"
+        tip="您的货物本地仓无货，将为您免费调货，配送可能有延迟"
+        :price="9900"
+        @submit="onSubmit" />
+      <b>通过插槽自定义内容</b>
+      <p>
+        共有3个插槽，top，tip，和一个匿名插槽
+      </p>
+      <van-submit-bar :price="9999" button-text="提交订单" @submit="onSubmit">
+        <div>
+          <van-checkbox v-model="checked">匿名插槽</van-checkbox>
+        </div>
+        <span slot="tip" class="van-submit-bar__tip">
+          tip插槽 slot="tip"
+        </span>
+        <div slot="top" class="top">
+          top插槽 slot="top"
+        </div>
+      </van-submit-bar>
+    </div>
+    <br>
+    <div class="sku">
+      <van-button type="danger" @click="showSku=true" size="large">基础用法</van-button>
+      <van-sku
+        v-model="showSku"
+        :sku="sku" />
     </div>
   </div>
 </template>
 
 <script>
-import { AddressEdit, Toast, AddressList,
-  Area, Actionsheet, Button, Card, Icon,
-  ContactCard,  ContactEdit, CouponCell, CouponList,
-  Popup } from 'vant'
+import { AddressEdit, Toast, AddressList, Checkbox,
+  Area, Actionsheet, Button, Card, Icon, SubmitBar,
+  ContactCard, ContactEdit, CouponCell, CouponList, Sku,
+  Popup, GoodsAction, GoodsActionBigBtn, GoodsActionMiniBtn } from 'vant'
 // vant 1.5.0 ContactList 组件使用了Button但未引入，修改后从此处引入ContactList
-import ContactList from 'vant/packages/contact-list' 
+import ContactList from 'vant/packages/contact-list'
 import area from 'vant/packages/area/demo/area'
 export default {
   name: 'business',
   components: {
+    [Sku.name]: Sku,
+    [Checkbox.name]: Checkbox,
+    [SubmitBar.name]: SubmitBar,
+    [GoodsAction.name]: GoodsAction,
+    [GoodsActionBigBtn.name]: GoodsActionBigBtn,
+    [GoodsActionMiniBtn.name]: GoodsActionMiniBtn,
     [CouponCell.name]: CouponCell,
     [CouponList.name]: CouponList,
     [Popup.name]: Popup,
@@ -173,12 +253,14 @@ export default {
   },
   data () {
     return {
+      showSku: false,
+      checked: false,
       showCoupons: false,
-      choosenCoupon: -1,
+      chosenCoupon: -1,
       isEdit: false,
       editingContact: {},
       editContact: false,
-      choosenContactId: null,
+      chosenContactId: null,
       showContactList: false,
       show: false,
       value: '11012',
@@ -186,9 +268,95 @@ export default {
       searchResult: [],
       chosenAddressId: 1,
       imgUrl: 'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/d698e745406545e28072eba4a6d377b9.jpg',
+      sku: {
+        tree: [
+          {
+            k: '颜色',
+            v: [
+              {
+                id: '10001',
+                name: '红色',
+                imgUrl: 'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/d698e745406545e28072eba4a6d377b9.jpg'
+              },
+              {
+                id: '10002',
+                name: '蓝色',
+                imgUrl: 'http://bmob-cdn-23203.b0.upaiyun.com/2018/12/27/d698e745406545e28072eba4a6d377b9.jpg'
+              }
+            ],
+            k_s: 's1'
+          },
+          {
+            k: '尺寸',
+            v: [
+              {
+                id: '20001',
+                name: '尺寸一'
+              },
+              {
+                id: '20002',
+                name: '尺寸二'
+              },
+              {
+                id: '20003',
+                name: '尺寸三'
+              }
+            ],
+            K_s: 's2'
+          }
+        ],
+        list: [
+          {
+            id: 100001,
+            price: 9999,
+            s1: '10001', // ks 为 s1 对应的规格id
+            s2: '20001', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 10 // 当前规格组合对应的库存
+          }, {
+            id: 100002,
+            price: 19900,
+            s1: '10001', // ks 为 s1 对应的规格id
+            s2: '20002', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 110 // 当前规格组合对应的库存
+          }, {
+            id: 100003,
+            price: 9900,
+            s1: '10001', // ks 为 s1 对应的规格id
+            s2: '20003', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 19 // 当前规格组合对应的库存
+          }, {
+            id: 100004,
+            price: 5900,
+            s1: '10002', // ks 为 s1 对应的规格id
+            s2: '20001', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 324 // 当前规格组合对应的库存
+          }, {
+            id: 100005,
+            price: 8800,
+            s1: '10005', // ks 为 s1 对应的规格id
+            s2: '20002', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 23 // 当前规格组合对应的库存
+          }, {
+            id: 100006,
+            price: 9800,
+            s1: '10001', // ks 为 s1 对应的规格id
+            s2: '20003', // ks 为 s2 对应的规格id
+            s3: '0', // 最多包含三个规格，0表示不存在此规格
+            stock_num: 110 // 当前规格组合对应的库存
+          }
+        ],
+        price: '99.99',
+        stock_num: 999,
+        collection_id: 1001,
+        none_sku: false
+      },
       coupons: [
         {
-          available: 1,
           id: 0,
           name: '优惠券一',
           discount: 88,
@@ -196,8 +364,41 @@ export default {
           originCondition: 10000,
           startAt: 1546080731,
           endAt: 1556080731,
-          reson: ''
+          reason: '',
+          value: 1200
         },
+        {
+          id: 1,
+          name: '优惠券二',
+          discount: 0,
+          denominations: 5000,
+          originCondition: 9900,
+          startAt: 1546080731,
+          endAt: 1556080731,
+          reason: ''
+        }
+      ],
+      disabledCoupons: [
+        {
+          id: 2,
+          name: '优惠券三',
+          discount: 10,
+          denominations: 0,
+          originCondition: 10000,
+          startAt: 1546080731,
+          endAt: 1556080731,
+          reason: '不可用原因'
+        },
+        {
+          id: 3,
+          name: '优惠券四',
+          discount: 0,
+          denominations: 10000,
+          originCondition: 19900,
+          startAt: 1546080731,
+          endAt: 1556080731,
+          reason: '不可用原因'
+        }
       ],
       list: [
         {
@@ -225,33 +426,52 @@ export default {
   },
   computed: {
     cardType () {
-      return this.choosenContactId === null ? 'add' : 'edit'
+      return this.chosenContactId === null ? 'add' : 'edit'
     },
     currentContact () {
-      const id = this.choosenContactId
-      return id !== null ? this.list.filter(item => id === item.id)[0]: {}
+      const id = this.chosenContactId
+      return id !== null ? this.list.filter(item => id === item.id)[0] : {}
     }
   },
   methods: {
+    onSubmit () {
+      Toast('提交订单')
+    },
+    chat () {
+      Toast('联系客服')
+    },
+    cart () {
+      Toast('去购物车')
+    },
+    addToCart () {
+      Toast('加入购物车')
+    },
+    buy () {
+      Toast('立即购买')
+    },
+    changeCoupons (index) {
+      this.chosenCoupon = index
+      this.showCoupons = false
+    },
     delContact (contact) {
       console.log(contact)
       const id = contact.id
-      this.list = this.list.filter(item => item.id !== id) 
+      this.list = this.list.filter(item => item.id !== id)
       this.editContact = false
-      if (this.choosenId = contact.id) {
-        this.choosenId = null
+      if (this.chosenId === contact.id) {
+        this.chosenId = null
       }
     },
-    saveContact(contact) {
+    saveContact (contact) {
       console.log(contact)
       this.editContact = false
       this.showContactList = false
       // this.isEdit = false
-      if(this.isEdit) {
-        this.list = this.list.map(item => item.id === contact.id? contact: item)
+      if (this.isEdit) {
+        this.list = this.list.map(item => item.id === contact.id ? contact : item)
       } else {
         this.list.push(contact)
-      }      
+      }
     },
     onSelect () {
       console.log('select')
@@ -266,7 +486,7 @@ export default {
     },
     addContact () {
       this.isEdit = false
-      this.editingContact = {id: this.list.length}
+      this.editingContact = { id: this.list.length }
       this.editContact = true
     },
     cityChange (picker, data, index) {
@@ -314,4 +534,8 @@ export default {
     position absolute
     bottom 0
     z-index 100
+.cart .van-goods-action
+  position static
+.submit-bar .van-submit-bar
+  position static
 </style>
